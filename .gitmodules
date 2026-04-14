@@ -1,0 +1,6 @@
+[submodule "archives/delphi-wxapp"]
+	path = archives/delphi-wxapp
+	url = https://github.com/aetherwu/delphi-wxapp
+[submodule "archives/delphi-web-server"]
+	path = archives/delphi-web-server
+	url = https://github.com/aetherwu/delphi-web-server
