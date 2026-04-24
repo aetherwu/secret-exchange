@@ -14,11 +14,12 @@ set -e
 export DB_DEBUG_URI="${DB_DEBUG_URI:-localhost:27017}"
 export DASHBOARD_USER="${DASHBOARD_USER:-admin}"
 export DASHBOARD_PASSWORD="${DASHBOARD_PASSWORD:-admin123}"
+FRONTEND_PORT="${FRONTEND_PORT:-3033}"
 
 echo "=== Truth-telling Development ==="
 echo ""
 echo "Backend:  http://localhost:5000"
-echo "Frontend: http://localhost:3000"
+echo "Frontend: http://localhost:$FRONTEND_PORT"
 echo "Admin:    http://localhost:5000/pool/ (user: $DASHBOARD_USER)"
 echo ""
 
@@ -88,7 +89,7 @@ if [ ! -d node_modules ]; then
   echo "  Installing dependencies..."
   npm install
 fi
-NEXT_PUBLIC_API_URL=http://localhost:5000 npm run dev &
+NEXT_PUBLIC_API_URL=http://localhost:5000 npx next dev --port "$FRONTEND_PORT" &
 FRONTEND_PID=$!
 cd ..
 
