@@ -1,0 +1,1 @@
+GIN_MODE=test nohup /home/dev/question >/home/dev/question.log 2>&1 &

@@ -1,0 +1,15 @@
+/vendor
+/tmp
+delphi
+
+msyh.ttf
+
+/static
+/bin
+
+pool/node_modules
+pool/dist
+
+server
+*.exe
+.env
