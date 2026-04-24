@@ -11,7 +11,7 @@
 set -e
 
 # Backend env vars (modify as needed)
-export DB_DEBUG_URI="${DB_DEBUG_URI:-localhost:27017}"
+export DB_DEBUG_URI="${DB_DEBUG_URI:-localhost:27018}"
 export DASHBOARD_USER="${DASHBOARD_USER:-admin}"
 export DASHBOARD_PASSWORD="${DASHBOARD_PASSWORD:-admin123}"
 FRONTEND_PORT="${FRONTEND_PORT:-3033}"
@@ -21,6 +21,39 @@ echo ""
 echo "Backend:  http://localhost:5000"
 echo "Frontend: http://localhost:$FRONTEND_PORT"
 echo "Admin:    http://localhost:5000/pool/ (user: $DASHBOARD_USER)"
+echo ""
+
+# Start PostgreSQL if available (for FerretDB)
+if command -v pg_isready &>/dev/null; then
+  if ! pg_isready -q 2>/dev/null; then
+    echo "[0/4] Starting PostgreSQL..."
+    pg_ctlcluster $(pg_lsclusters -h | head -1 | awk '{print $1, $2}') start 2>/dev/null || true
+  fi
+fi
+
+# Start FerretDB (MongoDB-compatible proxy backed by PostgreSQL)
+if [ -z "$SKIP_FERRETDB" ] && ! nc -z 127.0.0.1 27017 2>/dev/null; then
+  if [ -f /tmp/ferretdb-v1 ]; then
+    echo "[0/4] Starting FerretDB..."
+    /tmp/ferretdb-v1 --listen-addr=127.0.0.1:27017 \
+      --postgresql-url="postgres://ferretdb:ferretdb@127.0.0.1:5432/ferretdb" \
+      --state-dir=/tmp/ferretdb-state --debug-addr=127.0.0.1:8089 \
+      --telemetry=disabled &>/tmp/ferretdb.log &
+    FERRETDB_PID=$!
+    sleep 2
+  fi
+fi
+
+# Start wire protocol proxy (mgo OP_QUERY -> OP_MSG translation)
+if ! nc -z 127.0.0.1 27018 2>/dev/null; then
+  if [ -f mongoproxy/main.go ]; then
+    echo "[0/4] Starting wire protocol proxy..."
+    cd mongoproxy && go build -o /tmp/mongoproxy . 2>/dev/null && cd ..
+    /tmp/mongoproxy &>/tmp/mongoproxy.log &
+    PROXY_PID=$!
+    sleep 1
+  fi
+fi
 echo ""
 
 # Check MongoDB
@@ -103,6 +136,8 @@ cleanup() {
   echo "Shutting down..."
   kill $FRONTEND_PID 2>/dev/null
   kill $BACKEND_PID 2>/dev/null
+  kill $PROXY_PID 2>/dev/null
+  kill $FERRETDB_PID 2>/dev/null
   wait
 }
 trap cleanup EXIT INT TERM
