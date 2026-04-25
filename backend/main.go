@@ -76,7 +76,14 @@ func initRouters() *gin.Engine {
 	// 日志 和 报错 中间件
 	router.Use(middleware.Logger(), gin.Recovery())
 	// 跨域 中间件
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	}))
 	// Gzip 中间件
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 

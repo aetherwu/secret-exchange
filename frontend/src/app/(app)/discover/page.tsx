@@ -33,7 +33,7 @@ export default function DiscoverPage() {
     setLoading(true);
     try {
       const res = await api<RandomResponse>("/question/random");
-      if (res.errCode !== 0) return;
+      if (res.errCode && res.errCode !== 0) return;
 
       if (!res.question) {
         setAllAnswered(true);
@@ -110,8 +110,7 @@ export default function DiscoverPage() {
       {question && (
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center min-h-[40vh] justify-center">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
-            Level {question.level} &middot; {question.answerCount}{" "}
-            {question.answerCount === 1 ? "answer" : "answers"}
+            Question
           </p>
           <h1 className="text-xl font-medium text-center leading-relaxed mb-8 max-w-lg">
             {question.content}

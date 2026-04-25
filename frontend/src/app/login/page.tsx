@@ -29,7 +29,12 @@ export default function LoginPage() {
         { email, password }
       );
 
-      if (data.errCode !== 0) {
+      if (data.errCode && data.errCode !== 0) {
+        setError(data.errMsg || "Login failed");
+        return;
+      }
+
+      if (!data.openid || !data.accessToken) {
         setError(data.errMsg || "Login failed");
         return;
       }

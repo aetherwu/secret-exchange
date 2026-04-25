@@ -19,12 +19,14 @@ interface User {
 
 interface Answer {
   id: string;
-  questionID: number;
-  userOpenID: string;
+  questionID: string;
   content: string;
-  contentLength: number;
+  length: number;
   privacy: number;
+  exchangeCount: number;
+  beExchangedCount: number;
   createdAt?: string;
+  user?: User;
 }
 
 interface Comment {
@@ -46,8 +48,8 @@ interface DetailResponse {
   errMsg?: string;
   answer: Answer;
   question: Question;
-  user: User;
-  isExchanged: boolean;
+  owner: boolean;
+  exchanged: boolean;
   exchangeds: ExchangeEntry[] | null;
   comments: Comment[] | null;
   myAnswer?: Answer | null;
@@ -98,7 +100,7 @@ export default function AnswerDetailPage({
       const res = await api<DetailResponse>("/answer/detail", {
         ID: id,
       });
-      if (res.errCode !== 0) {
+      if (res.errCode && res.errCode !== 0) {
         setError(res.errMsg || "Failed to load answer");
         return;
       }
@@ -122,7 +124,7 @@ export default function AnswerDetailPage({
       const res = await api("/answer/exchange-answer", {
         ID: id,
       });
-      if (res.errCode !== 0) {
+      if (res.errCode && res.errCode !== 0) {
         setError(res.errMsg || "Exchange failed");
         return;
       }
@@ -160,9 +162,9 @@ export default function AnswerDetailPage({
 
   if (!data) return null;
 
-  const { answer, question, user, isExchanged, exchangeds, myAnswer, isFriend } =
+  const { answer, question, owner: isOwner, exchanged: isExchanged, exchangeds, myAnswer, isFriend } =
     data;
-  const isOwner = myOpenID === answer.userOpenID;
+  const user = answer.user || { openID: "", nickname: "Someone" };
 
   // ── Owner view ──
   if (isOwner) {
@@ -327,7 +329,7 @@ export default function AnswerDetailPage({
           <p className="text-gray-500 mb-1">
             {user.nickname || "Someone"} answered{" "}
             <span className="font-medium text-gray-700">
-              {answer.contentLength} characters
+              {answer.length} characters
             </span>
           </p>
           <p className="text-sm text-gray-400">
@@ -371,7 +373,7 @@ export default function AnswerDetailPage({
         <p className="text-gray-500 mb-1">
           {user.nickname || "Someone"} answered{" "}
           <span className="font-medium text-gray-700">
-            {answer.contentLength} characters
+            {answer.length} characters
           </span>
         </p>
         <p className="text-sm text-gray-400">

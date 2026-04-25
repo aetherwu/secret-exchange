@@ -82,7 +82,7 @@ function WriteForm() {
           Answer: content.trim(),
           Private: privacy,
         });
-        if (res.errCode !== 0) {
+        if (res.errCode && res.errCode !== 0) {
           setError(res.errMsg || "Exchange failed");
           return;
         }
@@ -95,7 +95,7 @@ function WriteForm() {
           Answer: content.trim(),
           Private: privacy,
         });
-        if (res.errCode !== 0) {
+        if (res.errCode && res.errCode !== 0) {
           setError(res.errMsg || "Failed to submit answer");
           return;
         }
