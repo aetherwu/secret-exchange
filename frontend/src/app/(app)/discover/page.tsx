@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { useRequireAuth } from "@/lib/useAuth";
 
 interface Question {
-  id: number;
+  id: string;
   content: string;
   level: number;
   answerCount: number;
@@ -15,10 +15,10 @@ interface Question {
 interface RandomResponse {
   errCode: number;
   question: Question | null;
-  limitRemaining: number;
-  answered: boolean;
-  exchange: boolean;
-  friendCount: number;
+  limit: number;
+  answerCount: number;
+  exchangedAnswerCount: number;
+  exchangedUserCount: number;
 }
 
 export default function DiscoverPage() {
@@ -42,7 +42,7 @@ export default function DiscoverPage() {
         setAllAnswered(false);
         setQuestion(res.question);
       }
-      setLimitRemaining(res.limitRemaining);
+      setLimitRemaining(res.limit);
     } finally {
       setLoading(false);
     }

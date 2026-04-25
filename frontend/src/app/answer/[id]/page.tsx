@@ -6,7 +6,7 @@ import { api, getOpenID } from "@/lib/api";
 import { useRequireAuth } from "@/lib/useAuth";
 
 interface Question {
-  id: number;
+  id: string;
   content: string;
   level: number;
 }
@@ -18,7 +18,7 @@ interface User {
 }
 
 interface Answer {
-  id: number;
+  id: string;
   questionID: number;
   userOpenID: string;
   content: string;
@@ -28,14 +28,14 @@ interface Answer {
 }
 
 interface Comment {
-  id: number;
+  id: string;
   content: string;
   userOpenID: string;
   createdAt?: string;
 }
 
 interface ExchangeEntry {
-  id: number;
+  id: string;
   userOpenID: string;
   content: string;
   nickname?: string;
@@ -96,7 +96,7 @@ export default function AnswerDetailPage({
     setLoading(true);
     try {
       const res = await api<DetailResponse>("/answer/detail", {
-        ID: Number(id),
+        ID: id,
       });
       if (res.errCode !== 0) {
         setError(res.errMsg || "Failed to load answer");
@@ -120,7 +120,7 @@ export default function AnswerDetailPage({
     setError(null);
     try {
       const res = await api("/answer/exchange-answer", {
-        ID: Number(id),
+        ID: id,
       });
       if (res.errCode !== 0) {
         setError(res.errMsg || "Exchange failed");

@@ -78,9 +78,9 @@ function WriteForm() {
       if (answerId) {
         // Exchange flow: write my answer and exchange with target answer
         const res = await api("/answer/exchange", {
-          ID: Number(answerId),
-          Content: content.trim(),
-          Privacy: privacy,
+          ID: answerId,
+          Answer: content.trim(),
+          Private: privacy,
         });
         if (res.errCode !== 0) {
           setError(res.errMsg || "Exchange failed");
@@ -90,10 +90,10 @@ function WriteForm() {
         router.push(`/answer/${answerId}`);
       } else {
         // Normal answer creation
-        const res = await api<{ id?: number }>("/answer/create", {
-          QuestionID: Number(questionId),
-          Content: content.trim(),
-          Privacy: privacy,
+        const res = await api<{ id?: string }>("/answer/create", {
+          ID: questionId,
+          Answer: content.trim(),
+          Private: privacy,
         });
         if (res.errCode !== 0) {
           setError(res.errMsg || "Failed to submit answer");
